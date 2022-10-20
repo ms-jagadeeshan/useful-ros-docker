@@ -24,7 +24,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./moveit
-          file: ./Dockerfile.moveit
+          file: {context}/Dockerfile.moveit
           push: true
           tags: jagamatrix/moveit-tutorials:latest
           cache-from: type=registry,ref=jagamatrix/moveit-tutorials:buildcache
