@@ -1,26 +1,37 @@
 FROM osrf/ros:noetic-desktop-full
 
 ENV ROS_DISTRO noetic
+ENV DEBIAN_FRONTEND noninteractive
 ENV ROS_WS /opt/ros_ws
 
 # Upgrading packages
-RUN rosdep update && apt update && DEBIAN_FRONTEND=noninteractive apt dist-upgrade -y && apt autoclean
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN DEBIAN_FRONTEND=noninteractive apt install -y git apt-utils ros-noetic-catkin python3-catkin-tools python3-osrf-pycommon python3-wstool && apt autoclean
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends git apt-utils ros-noetic-catkin python3-catkin-tools python3-osrf-pycommon python3-wstool && \
+    rm -rf /var/lib/apt/lists/*
 
 
 # Setup Moveit Workspace
 RUN mkdir -p ${ROS_WS}/src 
 WORKDIR ${ROS_WS}/src
 
-RUN wstool init .
-RUN wstool merge -t . https://raw.githubusercontent.com/ros-planning/moveit/master/moveit.rosinstall 
-RUN wstool remove  moveit_tutorials
-RUN wstool update -t .
+RUN wstool init . && \
+    wstool merge -t . https://raw.githubusercontent.com/ros-planning/moveit/master/moveit.rosinstall && \ 
+    wstool remove  moveit_tutorials && \
+    wstool update -t .
+
 RUN git clone https://github.com/ros-planning/moveit_tutorials.git -b master
 RUN git clone https://github.com/ros-planning/panda_moveit_config.git -b noetic-devel || true
-RUN rosdep install -y --from-paths . --ignore-src --rosdistro noetic
-WORKDIR ${ROS_WS}
+RUN apt-get update && \
+    rosdep init && \
+    rosdep update && \
+    rosdep install -y --from-paths . --ignore-src --rosdistro noetic && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR $ROS_WS
 RUN . /opt/ros/noetic/setup.sh && catkin config --extend /opt/ros/noetic --cmake-args -DCMAKE_BUILD_TYPE=Release && catkin build
 
 # setup entrypoint

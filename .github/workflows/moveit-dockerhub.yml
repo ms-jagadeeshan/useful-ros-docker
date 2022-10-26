@@ -27,6 +27,6 @@ jobs:
           file: ./moveit/Dockerfile.moveit
           push: true
           tags: jagamatrix/moveit-tutorials:latest
-          cache-from: type=registry,ref=jagamatrix/moveit-tutorials:buildcache
-          cache-to: type=registry,ref=jagamatrix/moveit-tutorials:buildcache,mode=max
+          cache-from: type=registry,ref=jagamatrix/moveit-tutorials:buildcache-moveit
+          cache-to: type=registry,ref=jagamatrix/moveit-tutorials:buildcache-moveit,mode=max
 
